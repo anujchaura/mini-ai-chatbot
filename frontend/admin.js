@@ -4,7 +4,7 @@
 
 const API_BASE = (() => {
     const local = ['localhost','127.0.0.1',''].includes(location.hostname) || location.protocol === 'file:';
-    return local ? 'http://127.0.0.1:8000' : 'https://ai-chatbot-backend-u84g.onrender.com';
+    return local ? 'http://127.0.0.1:8000' : 'https://mini-ai-chatbot-p2qe.onrender.com';
 })();
 
 console.info(`[VEDA] API_BASE = ${API_BASE}`);

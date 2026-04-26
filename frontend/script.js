@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://ai-chatbot-backend-u84g.onrender.com'; // Deployed backend URL on Render
+const API_BASE_URL = 'https://mini-ai-chatbot-p2qe.onrender.com'; // Deployed backend URL on Render
 
 // ── FIX 3: Clear admin session when chatbot page loads ──
 // This ensures the admin must re-login if they navigate to index.html
