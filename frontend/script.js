@@ -193,6 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     appendMessage(data.response, 'ai-message');
                 } else if (data.reply) { // handle reply property if updated
                     appendMessage(data.reply, 'ai-message');
+                } else if (data.detail) {
+                    // Display the specific error from the backend (e.g. API key missing)
+                    appendMessage(`Error: ${data.detail}`, 'ai-message');
                 } else {
                     appendMessage("Error: Empty response from server.", 'ai-message');
                 }
