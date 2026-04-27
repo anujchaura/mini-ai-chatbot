@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeChatBox(userName) {
         if (chatBox.children.length === 0) {
             const welcomeName = userName || 'there';
-            appendMessage(`Hello ${welcomeName}! How can I help you today?`, 'ai-message');
+            addMessage(`Hello ${welcomeName}! How can I help you today?`, 'bot');
             chatInput.disabled = false;
             sendBtn.disabled = false;
         }
@@ -155,55 +155,60 @@ document.addEventListener('DOMContentLoaded', () => {
             
             isSending = true;
 
+            // Debug User Input
+            console.log("User message:", message);
+
             // Retrieve stored user identity (set when lead form was submitted)
             const userEmail = localStorage.getItem('userEmail') || '';
             const userName  = localStorage.getItem('userName')  || '';
 
-            // Add User Message to UI
-            appendMessage(message, 'user-message');
+            // STEP 2: CORRECT MESSAGE FLOW - User message on RIGHT
+            addMessage(message, "user"); 
+            
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Show loading indicator
-            const loadingId = appendMessage('Typing...', 'ai-message');
-            
+            // STEP 5: FIX TYPING ELEMENT - Typing on Bot side
+            const showTyping = () => {
+                const msg = document.createElement("div");
+                msg.className = "message bot-message typing";
+                msg.innerText = "Typing...";
+                msg.id = "typing-indicator";
+                chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
+
             const removeTyping = () => {
-                const el = document.getElementById(loadingId);
+                const el = document.getElementById("typing-indicator");
                 if (el) el.remove();
             };
 
-            console.log("Sending request...");
+            showTyping();
+
             console.log(`[Chatbot] Sending chat: "${message.substring(0, 60)}" (user: ${userEmail})`);
 
             fetch(`${baseUrl}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Include user_email and user_name so the backend saves to DB
                 body: JSON.stringify({ message, user_email: userEmail, user_name: userName })
             })
-            .then(res => {
-                console.log(`[Chatbot] /chat response: HTTP ${res.status}`);
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                console.log("Response received:", data);
                 removeTyping();
-                if (data.response) {
-                    appendMessage(data.response, 'ai-message');
-                } else if (data.reply) { // handle reply property if updated
-                    appendMessage(data.reply, 'ai-message');
-                } else if (data.detail) {
-                    // Display the specific error from the backend (e.g. API key missing)
-                    appendMessage(`Error: ${data.detail}`, 'ai-message');
-                } else {
-                    appendMessage("Error: Empty response from server.", 'ai-message');
-                }
+                
+                const botReply = data.response || data.reply || (data.detail ? `Error: ${data.detail}` : "Error: Empty response from server.");
+                
+                // Debug Bot Reply
+                console.log("Bot reply:", botReply);
+
+                // STEP 3: AFTER API RESPONSE - Bot message on LEFT
+                addMessage(botReply, "bot");
             })
             .catch(err => {
                 console.error('[Chatbot] Chat fetch error:', err);
                 removeTyping();
-                appendMessage("Server error. Please check backend connection.", 'ai-message');
+                addMessage("Server error. Please check backend connection.", "bot");
             })
             .finally(() => {
                 chatInput.disabled = false;
@@ -227,15 +232,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function appendMessage(text, className) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${className}`;
-        msgDiv.innerText = text;
-        const id = 'msg-' + Date.now();
-        msgDiv.id = id;
-        chatBox.appendChild(msgDiv);
+    // STEP 1: FIX MESSAGE FUNCTION
+    function addMessage(text, role) {
+        const msg = document.createElement("div");
+
+        if (role === "user") {
+            msg.className = "message user-message";
+        } else {
+            msg.className = "message bot-message";
+        }
+
+        msg.innerText = text;
+        chatBox.appendChild(msg);
         chatBox.scrollTop = chatBox.scrollHeight;
-        return id;
     }
 
     // Admin Page Logic

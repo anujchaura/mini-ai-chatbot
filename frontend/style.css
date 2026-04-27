@@ -509,16 +509,21 @@ body.dark-mode .theme-slider {
 
 .user-message {
     align-self: flex-end;
-    background-color: var(--primary-color);
-    color: #ffffff;
+    background: #4CAF50;
+    color: white;
     border-bottom-right-radius: 4px;
 }
 
-.ai-message {
+.bot-message {
     align-self: flex-start;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    background: #2f3e46;
+    color: white;
     border-bottom-left-radius: 4px;
+}
+
+.typing {
+    font-style: italic;
+    opacity: 0.8;
 }
 
 .chat-input-area {
